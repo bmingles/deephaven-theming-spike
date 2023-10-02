@@ -1,0 +1,74 @@
+:root {
+  /* Grays */
+  --dh-color-gray-hue: 0deg;
+  --dh-color-gray-50: hsl(var(--dh-color-gray-hue), 6%, 10%);
+  --dh-color-gray-75: hsl(var(--dh-color-gray-hue), 5%, 13%);
+  --dh-color-gray-100: hsl(var(--dh-color-gray-hue), 5%, 17%);
+  --dh-color-gray-200: hsl(var(--dh-color-gray-hue), 4%, 19%);
+  --dh-color-gray-300: hsl(var(--dh-color-gray-hue), 4%, 21%);
+  --dh-color-gray-400: hsl(var(--dh-color-gray-hue), 2%, 25%);
+  --dh-color-gray-500: hsl(var(--dh-color-gray-hue), 1%, 36%);
+  --dh-color-gray-600: hsl(var(--dh-color-gray-hue), 0%, 57%);
+  --dh-color-gray-700: hsl(var(--dh-color-gray-hue), 1%, 75%);
+  --dh-color-gray-800: hsl(var(--dh-color-gray-hue), 6%, 94%);
+  --dh-color-gray-900: hsl(var(--dh-color-gray-hue), 25%, 98%);
+
+  /* Blues */
+  --dh-color-blue-hue: 222deg;
+  --dh-color-blue-100: hsl(var(--dh-color-blue-hue), 65%, 19%);
+  --dh-color-blue-200: hsl(var(--dh-color-blue-hue), 66%, 25%);
+  --dh-color-blue-300: hsl(var(--dh-color-blue-hue), 65%, 32%);
+  --dh-color-blue-400: hsl(var(--dh-color-blue-hue), 63%, 39%);
+  --dh-color-blue-500: hsl(var(--dh-color-blue-hue), 61%, 47%);
+  --dh-color-blue-600: hsl(var(--dh-color-blue-hue), 68%, 54%);
+  --dh-color-blue-700: hsl(var(--dh-color-blue-hue), 83%, 62%);
+  --dh-color-blue-800: hsl(var(--dh-color-blue-hue), 94%, 68%);
+  --dh-color-blue-900: hsl(var(--dh-color-blue-hue), 100%, 74%);
+  --dh-color-blue-1000: hsl(var(--dh-color-blue-hue), 100%, 80%);
+  --dh-color-blue-1100: hsl(var(--dh-color-blue-hue), 100%, 84%);
+  --dh-color-blue-1200: hsl(var(--dh-color-blue-hue), 100%, 89%);
+  --dh-color-blue-1300: hsl(var(--dh-color-blue-hue), 100%, 93%);
+  --dh-color-blue-1400: hsl(var(--dh-color-blue-hue), 100%, 96%);
+
+  /* Seafoam */
+  --dh-color-seafoam-hue: 160deg;
+  --dh-color-seafoam-100: hsl(var(--dh-color-seafoam-hue), 14%, 14%);
+  --dh-color-seafoam-200: hsl(var(--dh-color-seafoam-hue), 17%, 18%);
+  --dh-color-seafoam-300: hsl(var(--dh-color-seafoam-hue), 20%, 23%);
+  --dh-color-seafoam-400: hsl(var(--dh-color-seafoam-hue), 23%, 28%);
+  --dh-color-seafoam-500: hsl(var(--dh-color-seafoam-hue), 26%, 33%);
+  --dh-color-seafoam-600: hsl(var(--dh-color-seafoam-hue), 29%, 37%);
+  --dh-color-seafoam-700: hsl(var(--dh-color-seafoam-hue), 33%, 42%);
+  --dh-color-seafoam-800: hsl(var(--dh-color-seafoam-hue), 36%, 47%);
+  --dh-color-seafoam-900: hsl(var(--dh-color-seafoam-hue), 42%, 51%);
+  --dh-color-seafoam-1000: hsl(var(--dh-color-seafoam-hue), 53%, 56%);
+  --dh-color-seafoam-1100: hsl(var(--dh-color-seafoam-hue), 66%, 62%);
+  --dh-color-seafoam-1200: hsl(var(--dh-color-seafoam-hue), 76%, 70%);
+  --dh-color-seafoam-1300: hsl(var(--dh-color-seafoam-hue), 87%, 80%);
+  --dh-color-seafoam-1400: hsl(var(--dh-color-seafoam-hue), 89%, 89%);
+
+  /* Reds */
+  --dh-color-red-hue: 345deg;
+  --dh-color-red-100: hsl(var(--dh-color-red-hue), 54%, 18%);
+  --dh-color-red-200: hsl(var(--dh-color-red-hue), 55%, 24%);
+  --dh-color-red-300: hsl(var(--dh-color-red-hue), 54%, 30%);
+  --dh-color-red-400: hsl(var(--dh-color-red-hue), 54%, 37%);
+  --dh-color-red-500: hsl(var(--dh-color-red-hue), 53%, 44%);
+  --dh-color-red-600: hsl(var(--dh-color-red-hue), 55%, 51%);
+  --dh-color-red-700: hsl(var(--dh-color-red-hue), 71%, 59%);
+  --dh-color-red-800: hsl(var(--dh-color-red-hue), 92%, 67%);
+  --dh-color-red-900: hsl(var(--dh-color-red-hue), 100%, 74%);
+  --dh-color-red-1000: hsl(var(--dh-color-red-hue), 100%, 80%);
+  --dh-color-red-1100: hsl(var(--dh-color-red-hue), 100%, 85%);
+  --dh-color-red-1200: hsl(var(--dh-color-red-hue), 100%, 90%);
+  --dh-color-red-1300: hsl(var(--dh-color-red-hue), 100%, 94%);
+  --dh-color-red-1400: hsl(var(--dh-color-red-hue), 100%, 96%);
+
+  /* Semantic */
+  --dh-color-black: var(--dh-color-gray-50);
+  --dh-color-white: var(--dh-color-gray-800);
+  --dh-accent-color: var(--dh-color-blue-700);
+  --dh-background-color: var(--dh-color-black);
+  --dh-foreground-color: var(--dh-color-white);
+  --dh-grid-background-color: var(--dh-background-color);
+}
