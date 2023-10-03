@@ -8,18 +8,20 @@
       body {
         display: flex;
         flex-direction: row;
-        height: 100vh;
         margin: 0;
       }
 
       iframe {
+        border: none;
         box-sizing: border-box;
         flex-grow: 1;
       }
     </style>
+    <link rel="stylesheet" href="palette.css" />
   </head>
   <body>
-    <iframe src="iframe.html?css=themes/hex.css"></iframe>
+    <div id="container"></div>
     <iframe src="iframe.html?css=themes/hsl.css"></iframe>
+    <script type="module" src="palette.js"></script>
   </body>
 </html>
