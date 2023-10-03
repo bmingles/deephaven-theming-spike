@@ -16,7 +16,13 @@ export async function loadCssProperties(cssPath) {
 
   await linkLoaded;
 
-  return getCssPropertyNames(cssPath);
+  const cssPropertyNames = getCssPropertyNames(cssPath);
+
+  if (cssPath.endsWith("hex.css")) {
+    generateHSLRanges(cssPropertyNames);
+  }
+
+  return cssPropertyNames;
 }
 
 /**
@@ -178,4 +184,76 @@ export function buildSwatches(containerEl, cssPropertyNames) {
 
     prevProperty = property;
   });
+}
+
+export function generateHSLRanges(cssPropertyNames) {
+  const computedStyle = window.getComputedStyle(document.body);
+  const colorPropRegex = /^--dh-color-(.*?)-\d/;
+  const extractHsl = /^hsl\((\d+)deg (\d+)% (\d+)%\)$/;
+
+  const colorGroups = {};
+
+  cssPropertyNames.forEach((property) => {
+    const colorName = colorPropRegex.exec(property)?.[1];
+    if (colorName == null) {
+      return;
+    }
+
+    if (colorGroups[colorName] == null) {
+      colorGroups[colorName] = {};
+    }
+
+    colorGroups[colorName][property] = computedStyle.getPropertyValue(property);
+  });
+
+  for (const colorName in colorGroups) {
+    const colorPropNames = Object.keys(colorGroups[colorName]);
+    const hslColors = Object.values(colorGroups[colorName]).map((hex) =>
+      rgbToHsl(hexToRgb(hex))
+    );
+
+    const hueAvg =
+      colorName === "gray"
+        ? 0
+        : Math.round(
+            hslColors.reduce(
+              (total, hsl) => total + Number(extractHsl.exec(hsl)?.[1]),
+              0
+            ) / hslColors.length
+          );
+
+    colorGroups[colorName] = {
+      [`--dh-color-${colorName}-hue`]: `${hueAvg}deg`,
+    };
+
+    hslColors.forEach((hsl, i) => {
+      const [, h, s, l] = extractHsl.exec(hsl) ?? [];
+      const offset = colorName === "gray" ? 0 : Number(h) - hueAvg;
+      const sign = offset >= 0 ? "+" : "-";
+
+      colorGroups[colorName][colorPropNames[i]] =
+        offset === 0
+          ? `hsl(var(--dh-color-${colorName}-hue) ${s}% ${l}%)`
+          : `hsl(calc(var(--dh-color-${colorName}-hue) ${sign} ${Math.abs(
+              offset
+            )}deg) ${s}% ${l}%)`;
+    });
+  }
+
+  const content = Object.entries(colorGroups)
+    .map(([colorName, group]) => {
+      const lines = [
+        `/* ${colorName.replace(/^([a-z])/, (a) => a.toUpperCase())} */`,
+        ...Object.entries(group).map(([prop, value]) => `${prop}: ${value};`),
+      ];
+
+      return lines.join("\n");
+    })
+    .join("\n\n");
+
+  console.log(content);
+
+  // const hslColors = hexColors.map((hex) => rgbToHsl(hexToRgb(hex)));
+
+  // console.log(hslColors);
 }

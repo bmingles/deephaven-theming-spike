@@ -202,12 +202,18 @@
 
   /* Fuchsia */
   --dh-color-fuchsia-hue: 286deg;
-  --dh-color-fuchsia-100: hsl(var(--dh-color-fuchsia-hue) 64% 16%);
-  --dh-color-fuchsia-200: hsl(var(--dh-color-fuchsia-hue) 53% 22%);
-  --dh-color-fuchsia-300: hsl(var(--dh-color-fuchsia-hue) 44% 29%);
+  --dh-color-fuchsia-100: hsl(
+    calc(var(--dh-color-fuchsia-hue) + 15deg) 64% 16%
+  );
+  --dh-color-fuchsia-200: hsl(
+    calc(var(--dh-color-fuchsia-hue) + 14deg) 53% 22%
+  );
+  --dh-color-fuchsia-300: hsl(
+    calc(var(--dh-color-fuchsia-hue) + 11deg) 44% 29%
+  );
   --dh-color-fuchsia-400: hsl(var(--dh-color-fuchsia-hue) 39% 35%);
   --dh-color-fuchsia-500: hsl(var(--dh-color-fuchsia-hue) 35% 43%);
-  --dh-color-fuchsia-600: hsl(var(--dh-color-fuchsia-hue) 33% 51%);
+  --dh-color-fuchsia-600: hsl(calc(var(--dh-color-fuchsia-hue) - 1deg) 33% 51%);
   --dh-color-fuchsia-700: hsl(var(--dh-color-fuchsia-hue) 40% 58%);
   --dh-color-fuchsia-800: hsl(var(--dh-color-fuchsia-hue) 50% 66%);
   --dh-color-fuchsia-900: hsl(var(--dh-color-fuchsia-hue) 61% 74%);
