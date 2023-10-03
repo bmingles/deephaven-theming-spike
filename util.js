@@ -148,9 +148,11 @@ export function buildSwatches(containerEl, cssPropertyNames) {
       hexToRgb(computedStyle.getPropertyValue(property))
     );
     div.innerHTML = `${property}: ${
-      colorValue === hslColorValue
+      colorValue === hslColorValue && !/-label$/.test(property)
         ? colorValue
-        : `${colorValue} <span title="HSL based on original HEX color">${hslColorValue}</span>`
+        : `${colorValue} <span title="HSL based on original HEX color">${
+            /-label$/.test(property) ? "HSL derived from hex" : hslColorValue
+          }</span>`
     }`;
 
     if (
