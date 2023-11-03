@@ -88,6 +88,39 @@ function hexToRgb(hex) {
   return `rgb(${r} ${g} ${b})`;
 }
 
+function parseRgba(rgbOrRgbaString) {
+  const [, name, args] = /^(rgba?)\((.*?)\)$/.exec(rgbOrRgbaString) ?? [];
+  if (name == null) {
+    return null;
+  }
+
+  // Split on spaces, commas, and slashes. Note that this more permissive than
+  // the CSS spec in that slashes should only be used to delimit the alpha value
+  // (e.g. r g b / a), but this would match r/g/b/a. It also would match a mixed
+  // delimiter case (e.g. r,g b,a). This seems like a reasonable tradeoff for the
+  // complexity that would be added to enforce the full spec.
+  const tokens = args.split(/[ ,/]/).filter(Boolean);
+
+  if (tokens.length < 3) {
+    return null;
+  }
+
+  const [r, g, b, a = 1] = tokens.map(Number);
+
+  return { r, g, b, a };
+}
+
+function rgbaToHex8({ r, g, b, a = 1 }) {
+  // eslint-disable-next-line no-param-reassign
+  a = Math.round(a * 255);
+
+  const [rh, gh, bh, ah] = [r, g, b, a].map((v) =>
+    v.toString(16).padStart(2, "0")
+  );
+
+  return `#${rh}${gh}${bh}${ah}`;
+}
+
 function rgbToHsl(rgb) {
   const match = /^rgb\((\d{1,3}) (\d{1,3}) (\d{1,3})\)$/.exec(rgb);
 
@@ -144,6 +177,10 @@ export function buildSwatches(containerEl, cssPropertyNames) {
   let prevProperty = null;
 
   cssPropertyNames.forEach((property, i) => {
+    if (property.endsWith("-hsl")) {
+      return;
+    }
+
     const div = document.createElement("div");
     div.className = "swatch";
     containerEl.appendChild(div);
@@ -153,11 +190,15 @@ export function buildSwatches(containerEl, cssPropertyNames) {
     const hslColorValue = rgbToHsl(
       hexToRgb(computedStyle.getPropertyValue(property))
     );
+
+    const isHex = colorValue !== hslColorValue;
+    const isLabel = /-label$/.test(property);
+
     div.innerHTML = `${property}: ${
-      colorValue === hslColorValue && !/-label$/.test(property)
+      !isHex && !isLabel
         ? colorValue
         : `${colorValue} <span title="HSL based on original HEX color">${
-            /-label$/.test(property) ? "HSL derived from hex" : hslColorValue
+            isLabel ? "HSL derived from hex" : hslColorValue
           }</span>`
     }`;
 
@@ -171,14 +212,22 @@ export function buildSwatches(containerEl, cssPropertyNames) {
 
     if (/-hue$/.test(property)) {
     } else {
-      div.style.setProperty("background-color", `var(${property})`);
+      console.log("[prop]", property);
+      const bgColor = `var(${property.replace(/-hsl$/, "")})`; // isHex ? colorValue : `var(${property})`;
+      div.style.setProperty("background-color", bgColor);
       const colorWeight = /-(\d+)$/.exec(property)?.[1];
+
       div.style.setProperty(
         "color",
-        colorWeight == null || colorWeight >= 700
-          ? "var(--dh-color-gray-75)"
-          : "var(--dh-color-gray-800)"
+        colorWeight == null || colorWeight < 700
+          ? "var(--dh-color-gray-800)"
+          : "var(--dh-color-gray-75)"
       );
+
+      const hex8 = rgbaToHex8(
+        parseRgba(computedStyle.getPropertyValue("background-color"))
+      );
+      div.title = hex8.substring(0, 7);
       // div.innerText = `${property}: ${computedStyle.backgroundColor}`;
     }
 
@@ -191,8 +240,11 @@ export function generateHSLRanges(cssPropertyNames) {
   const colorPropRegex = /^--dh-color-(.*?)-\d/;
   const extractHsl = /^hsl\((\d+)deg (\d+)% (\d+)%\)$/;
 
+  const baseHues = {};
   const colorGroups = {};
+  const hslColorGroups = {};
 
+  // Initialize colorGroups with hex colors
   cssPropertyNames.forEach((property) => {
     const colorName = colorPropRegex.exec(property)?.[1];
     if (colorName == null) {
@@ -203,9 +255,11 @@ export function generateHSLRanges(cssPropertyNames) {
       colorGroups[colorName] = {};
     }
 
+    // Hex color (this will get replaced below)
     colorGroups[colorName][property] = computedStyle.getPropertyValue(property);
   });
 
+  // HSL colors
   for (const colorName in colorGroups) {
     const colorPropNames = Object.keys(colorGroups[colorName]);
     const hslColors = Object.values(colorGroups[colorName]).map((hex) =>
@@ -213,7 +267,7 @@ export function generateHSLRanges(cssPropertyNames) {
     );
 
     const hueAvg =
-      colorName === "gray"
+      colorName === "grayx"
         ? 0
         : Math.round(
             hslColors.reduce(
@@ -222,28 +276,48 @@ export function generateHSLRanges(cssPropertyNames) {
             ) / hslColors.length
           );
 
-    colorGroups[colorName] = {
+    baseHues[colorName] = {
       [`--dh-color-${colorName}-hue`]: `${hueAvg}deg`,
     };
+    hslColorGroups[colorName] = {};
+    colorGroups[colorName] = {};
 
     hslColors.forEach((hsl, i) => {
       const [, h, s, l] = extractHsl.exec(hsl) ?? [];
-      const offset = colorName === "gray" ? 0 : Number(h) - hueAvg;
+      const offset = colorName === "grayx" ? 0 : Number(h) - hueAvg;
       const sign = offset >= 0 ? "+" : "-";
 
-      colorGroups[colorName][colorPropNames[i]] =
+      // Hsl value arrays e.g. --dh-color-blue-100-hsl: var(--dh-color-blue-hue), 65%, 19%;
+      hslColorGroups[colorName][`${colorPropNames[i]}-hsl`] =
         offset === 0
-          ? `hsl(var(--dh-color-${colorName}-hue) ${s}% ${l}%)`
-          : `hsl(calc(var(--dh-color-${colorName}-hue) ${sign} ${Math.abs(
+          ? `var(--dh-color-${colorName}-hue), ${s}%, ${l}%`
+          : `calc(var(--dh-color-${colorName}-hue) ${sign} ${Math.abs(
               offset
-            )}deg) ${s}% ${l}%)`;
+            )}deg), ${s}%, ${l}%`;
+
+      // Color variable based on hsl array e.g. --dh-color-blue-100: hsl(var(--dh-color-blue-100-hsl));
+      colorGroups[colorName][
+        colorPropNames[i]
+      ] = `hsl(var(${colorPropNames[i]}-hsl))`;
     });
   }
+
+  console.log("[Group]: baseHues", baseHues);
+  console.log("[Group]: hslColorGroups", hslColorGroups);
+  console.log("[Group]: colorGroups", colorGroups);
 
   const content = Object.entries(colorGroups)
     .map(([colorName, group]) => {
       const lines = [
         `/* ${colorName.replace(/^([a-z])/, (a) => a.toUpperCase())} */`,
+        ...Object.entries(baseHues[colorName]).map(
+          ([prop, value]) => `${prop}: ${value};`
+        ),
+        "",
+        ...Object.entries(hslColorGroups[colorName]).map(
+          ([prop, value]) => `${prop}: ${value};`
+        ),
+        "",
         ...Object.entries(group).map(([prop, value]) => `${prop}: ${value};`),
       ];
 
@@ -251,7 +325,7 @@ export function generateHSLRanges(cssPropertyNames) {
     })
     .join("\n\n");
 
-  console.log(content);
+  console.log("[Content]:", content);
 
   // const hslColors = hexColors.map((hex) => rgbToHsl(hexToRgb(hex)));
 

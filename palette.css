@@ -2,6 +2,8 @@ body {
   font-family: sans-serif;
   font-size: 14px;
   margin: 0;
+  background-color: #2d2a2e; /* original DH background color */
+  color: #f0f0ee;
 }
 .swatch {
   display: grid;
