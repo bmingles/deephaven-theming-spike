@@ -158,9 +158,13 @@ function rgbToHsl(rgb) {
 
   const hsl = {
     h: Math.round(h),
-    s: Math.round(s * 100),
-    l: Math.round(l * 100),
+    s: Math.round(s * 1000) / 10,
+    l: Math.round(l * 1000) / 10,
   };
+
+  if (Math.round(h) === 285) {
+    console.log("[hsl]", r, g, b, hsl, h, s * 100, l * 100);
+  }
 
   return `hsl(${hsl.h}deg ${hsl.s}% ${hsl.l}%)`;
 }
@@ -238,7 +242,7 @@ export function buildSwatches(containerEl, cssPropertyNames) {
 export function generateHSLRanges(cssPropertyNames) {
   const computedStyle = window.getComputedStyle(document.body);
   const colorPropRegex = /^--dh-color-(.*?)-\d/;
-  const extractHsl = /^hsl\((\d+)deg (\d+)% (\d+)%\)$/;
+  const extractHsl = /^hsl\((\d+)deg (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%\)$/;
 
   const baseHues = {};
   const colorGroups = {};
